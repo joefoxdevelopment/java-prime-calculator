@@ -3,25 +3,58 @@
  */
 package com.joefox.prime;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class AppTest {
 
     private App app;
+    private Runner runner;
 
     @BeforeEach public void init() {
-        this.app = new App();
+        this.runner = mock(Runner.class);
+        this.app    = new App(this.runner);
     }
 
-    @Test public void testGetGreetingReturnsHelloWorld() {
-        assertEquals("Hello world.", this.app.getGreeting());
+    @ParameterizedTest
+    @MethodSource("provideInvalidArgsArray")
+    public void testMainReturnsBeforeCalculationWithInvalidArguments(final String[] args) {
+        App.main(args);
     }
 
-    @Test public void testGetInstanceReturnsApp() {
-        App newInstance = App.getInstance();
-        assertTrue(newInstance instanceof App);
-        assertEquals(newInstance, App.getInstance());
+    @ParameterizedTest
+    @MethodSource("provideValidArgsArray")
+    public void testMainRunsApp(final String[] args) {
+        App.main(args);
+    }
+
+    @Test
+    public void testRunCallsRunner() {
+        this.app.run();
+        verify(this.runner).run();
+    }
+
+    public static Stream<Arguments> provideInvalidArgsArray() {
+        return Stream.of(
+            Arguments.of((Object) new String[]{}),
+            Arguments.of((Object) new String[]{"not a number", "5"}),
+            Arguments.of((Object) new String[]{"3", "not a number"}),
+            Arguments.of((Object) new String[]{"1", "5"}),
+            Arguments.of((Object) new String[]{"10", "5"})
+        );
+    }
+
+    public static Stream<Arguments> provideValidArgsArray() {
+        return Stream.of(
+            Arguments.of((Object) new String[]{"4", "5"}),
+            Arguments.of((Object) new String[]{"4", "5", "all"})
+        );
     }
 }

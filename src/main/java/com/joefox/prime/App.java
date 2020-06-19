@@ -3,30 +3,88 @@
  */
 package com.joefox.prime;
 
+import com.joefox.prime.results.Result;
+import com.joefox.prime.test.Tester;
+
+import java.util.ArrayList;
+
 public class App {
 
+    private Runner runner;
     private static App instance;
 
-    public App() {}
+    public App(Runner runner) {
+        this.runner = runner;
+    }
 
-    public static App getInstance() {
+    public void run() {
+        this.runner.run();
+    }
+
+    public static void main(String[] args) {
+        try {
+            App.validateArgs(args);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        App app = App.getInstance(Integer.parseInt(args[0]), Integer.parseInt(args[1]), App.shouldShowAll(args));
+        app.run();
+    }
+
+    private static App getInstance(int min, int max, boolean showAll) {
         if (null == instance) {
-            instance = new App();
+            instance = App.createApp(min, max, showAll);
         }
 
         return instance;
     }
 
-    public String getGreeting() {
-        return "Hello world.";
+    private static App createApp(int min, int max, boolean showAll) {
+        return new App(new Runner(
+            min,
+            max,
+            new Output(),
+            showAll,
+            new Tester()
+        ));
     }
 
-    public void run() {
-        System.out.println(this.getGreeting());
+    private static void validateArgs(String[] args) throws Exception {
+        if (2 > args.length) {
+            throw new Exception(
+                "USAGE\nmin max [all]\n\n" +
+                "REQUIRED ARGUMENTS\nmin - Lower bounds value to test\nmax - Upper bounds value to test\n\n" +
+                "OPTIONAL ARGUMENTS\nall - display all results once calculation completed"
+            );
+        }
+
+        String integerRegex = "^\\d+$";
+        if (!args[0].matches(integerRegex) || !args[1].matches(integerRegex)) {
+            throw new Exception("One or more arguments are not positive integers.");
+        }
+
+        int arg0 = Integer.parseInt(args[0]);
+        int arg1 = Integer.parseInt(args[1]);
+
+        if (2 > arg0) {
+            throw new Exception("Min must be greater than 2");
+        }
+
+        if (arg0 >= arg1) {
+            throw new Exception("Argument 2 must be greater than the value of argument 1");
+        }
     }
 
-    public static void main(String[] args) {
-        var app = App.getInstance();
-        app.run();
+    private static boolean shouldShowAll(String[] args) {
+        boolean exists;
+        try {
+            exists = (null != args[2]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return false;
+        }
+
+        return exists;
     }
 }

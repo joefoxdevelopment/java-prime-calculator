@@ -27,9 +27,15 @@ dependencies {
     // Use JUnit test framework
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.mockito:mockito-core:3.3.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.2")
 }
 
 application {
     // Define the main class for the application.
     mainClassName = "com.joefox.prime.App"
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }
