@@ -25,7 +25,8 @@ dependencies {
     implementation("com.google.guava:guava:28.1-jre")
 
     // Use JUnit test framework
-    testImplementation("junit:junit:4.12")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
 application {

@@ -4,11 +4,29 @@
 package com.joefox.prime;
 
 public class App {
+
+    private static App instance;
+
+    public App() {}
+
+    public static App getInstance() {
+        if (null == instance) {
+            instance = new App();
+        }
+
+        return instance;
+    }
+
     public String getGreeting() {
         return "Hello world.";
     }
 
+    public void run() {
+        System.out.println(this.getGreeting());
+    }
+
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        var app = App.getInstance();
+        app.run();
     }
 }
